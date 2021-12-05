@@ -1,26 +1,67 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useCallback } from 'react';
+import faker from 'faker';
 
-function App() {
+import { Header } from './components/header';
+import { Footer } from './components/footer';
+import { Article } from './components/article';
+import { Button } from './components/button';
+
+import articles from './articles.json';
+
+import { useUser } from './stores/user';
+
+export const App = () => {
+  const updateUser = useUser(user => user.updateUser);
+  const updateCompany = useUser(user => user.updateCompany);
+  const age = useUser(user => user.age);
+  
+  const handleClick = useCallback(() => {
+    updateUser({
+      age: 47,
+      name: faker.name.findName(),
+    })
+  }, [updateUser]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <>
+      <Header />
 
-export default App;
+      <main style={{ maxWidth: 1120, margin: '0 auto' }}>
+        <section 
+          style={{ 
+            width: '100%', 
+            display: 'flex', 
+            justifyContent: 'center',
+            marginBottom: 32,
+          }}
+        >
+          <Button onClick={handleClick}>
+            Update User
+          </Button>
+
+          <Button onClick={handleClick} style={{ marginLeft: 16 }}>
+            Change Name
+          </Button>
+
+          <Button 
+            onClick={() => updateCompany(`Todos os direitos reservados ${faker.internet.domainName()}`)} 
+            style={{ marginLeft: 16 }}
+          >
+            Change Footer
+          </Button>
+        </section>
+
+        {articles.map(({ title, content }) => (
+          <Article
+            key={title}
+            title={title} 
+            content={content}
+            age={age}
+          />
+        ))}
+      </main>
+
+      <Footer />
+    </>
+  );
+};
